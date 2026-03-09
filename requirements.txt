@@ -1,0 +1,8 @@
+Django>=4.2
+SpeechRecognition
+librosa
+numpy
+scipy
+opencv-python
+matplotlib
+pydub

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-20 glass-panel p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+    <div
+        class="absolute inset-x-0 -top-8 h-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 blur-xl opacity-30">
+    </div>
+    <div class="text-center relative z-10 mb-8">
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-2">Welcome Back</h2>
+        <p class="text-gray-400 font-light">
+            Sign in to track your public speaking progress.
+        </p>
+    </div>
+
+    <form method="post" class="space-y-6 relative z-10">
+        {% csrf_token %}
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2" for="id_username">Username</label>
+            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150"
+                required id="id_username"
+                class="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="Enter your username">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2" for="id_password">Password</label>
+            <input type="password" name="password" autocomplete="current-password" required id="id_password"
+                class="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="••••••••">
+        </div>
+
+        {% if form.errors %}
+        <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm mt-4">
+            <p>Your username and password didn't match. Please try again.</p>
+        </div>
+        {% endif %}
+
+        <div class="pt-2">
+            <button type="submit"
+                class="w-full flex justify-center py-3 px-4 rounded-xl shadow-md bg-blue-600 hover:bg-blue-500 text-sm font-semibold tracking-wide text-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition transform hover:-translate-y-0.5">
+                Sign In
+            </button>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+</div>
+{% endblock %}

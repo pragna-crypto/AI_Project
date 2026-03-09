@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-12 mt-10">
+    <div class="glass-panel p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+        <div
+            class="absolute inset-x-0 -top-8 h-20 bg-gradient-to-r from-purple-500 via-indigo-600 to-blue-500 blur-2xl opacity-20">
+        </div>
+        <div class="relative z-10 text-center">
+            <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tight">Your Speaking History</h2>
+            <p class="text-gray-400 font-light">Track your progress and revisit past speeches.</p>
+        </div>
+
+        <div class="mt-8">
+            <canvas id="progressChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- History List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for a in analyses %}
+        <div
+            class="glass-panel p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-slate-700 hover:border-blue-500/50 transform hover:-translate-y-1 group">
+            <a href="{% url 'results' a.pk %}" class="block">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{{ a.title }}
+                    </h3>
+                    <div
+                        class="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/20">
+                        {{ a.confidence_score|floatformat:1 }} Score
+                    </div>
+                </div>
+                <div class="text-sm text-gray-400 flex flex-col gap-2">
+                    <div class="flex items-center justify-between"><span class="font-medium">WPM:</span> <span
+                            class="text-gray-300">{{ a.speech_speed_wpm|floatformat:1 }}</span></div>
+                    <div class="flex items-center justify-between"><span class="font-medium">Fillers:</span> <span
+                            class="text-gray-300">{{ a.filler_words_count }}</span></div>
+                    <div class="flex items-center justify-between"><span class="font-medium">Pauses:</span> <span
+                            class="text-gray-300">{{ a.pause_count }}</span></div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-700/50 text-xs text-slate-500 font-medium tracking-wide">
+                    {{ a.created_at|date:"M d, Y - H:i" }}
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12 glass-panel rounded-2xl text-slate-400">
+            No speeches uploaded yet. <a href="{% url 'upload' %}"
+                class="text-blue-400 font-medium hover:underline">Upload your first speech</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    {% if progress_scores %}
+    const ctx = document.getElementById('progressChart').getContext('2d');
+
+    // Gradient fill
+    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(56, 182, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(56, 182, 255, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ progress_dates| safe }},
+        datasets: [{
+            label: 'Confidence Score Over Time',
+            data: {{ progress_scores| safe }},
+        borderColor: '#38bdf8', /* Tailwind sky-400 */
+        backgroundColor: gradient,
+        borderWidth: 3,
+        pointBackgroundColor: '#0ea5e9',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: '#0ea5e9',
+        fill: true,
+        tension: 0.4 /* Smooth curves */
+            }]
+        },
+        options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                ticks: { color: '#94a3b8' }
+            },
+            x: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                ticks: { color: '#94a3b8', font: { size: 10 } }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+    });
+    {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8 mt-10">
+    <!-- Header banner -->
+    <div class="glass-panel p-8 rounded-3xl flex justify-between items-center shadow-lg relative overflow-hidden">
+        <div
+            class="absolute inset-x-0 -top-8 h-20 bg-gradient-to-r from-teal-400 via-emerald-600 to-emerald-400 blur-2xl opacity-20">
+        </div>
+        <div class="relative z-10 w-full text-center">
+            <h2 class="text-3xl font-extrabold text-white mb-2">{{ analysis.title }}</h2>
+            <p class="text-gray-400 text-sm">Analyzed on {{ analysis.created_at|date:"M d, Y" }}</p>
+        </div>
+        <div class="relative z-10 text-center glass-panel px-8 py-6 rounded-2xl border border-emerald-500/30">
+            <h1
+                class="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-br from-emerald-300 to-emerald-600">
+                {{ analysis.confidence_score|floatformat:1 }}
+            </h1>
+            <p class="text-xs uppercase tracking-widest text-emerald-400 font-bold mt-2">Overall Score</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- Score breakdown -->
+        <div class="glass-panel p-8 rounded-3xl shadow-lg relative">
+            <h3 class="text-xl font-bold mb-6 text-gray-200">Scoring Breakdown</h3>
+            <canvas id="scoreChart"></canvas>
+            <script>
+                const ctx = document.getElementById('scoreChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: {{ chart_labels| safe }},
+                    datasets: [{
+                        data: {{ chart_scores| safe }},
+                    backgroundColor: [
+                        'rgba(56, 182, 255, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(56, 182, 255, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                        }]
+                    },
+                    options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#f8fafc' },
+                            ticks: { backdropColor: 'transparent', color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#f8fafc' } }
+                    }
+                }
+                });
+            </script>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Speed -->
+            <div class="glass-panel p-6 rounded-2xl shadow-md border-t border-blue-500/30">
+                <p class="text-sm text-gray-400 font-medium tracking-wide">Speech Speed</p>
+                <p class="text-3xl font-bold mt-2 text-white">{{ analysis.speech_speed_wpm|floatformat:1 }} <span
+                        class="text-sm font-normal text-gray-500">WPM</span></p>
+                <div class="mt-4 text-xs">
+                    <span
+                        class="inline-block px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-[10px] font-bold">Ideal:
+                        130-160</span>
+                </div>
+            </div>
+            <!-- Fillers -->
+            <div class="glass-panel p-6 rounded-2xl shadow-md border-t border-pink-500/30">
+                <p class="text-sm text-gray-400 font-medium tracking-wide">Filler Words</p>
+                <p class="text-3xl font-bold mt-2 text-white">{{ analysis.filler_words_count }} <span
+                        class="text-sm font-normal text-gray-500">found</span></p>
+            </div>
+            <!-- Pauses -->
+            <div class="glass-panel p-6 rounded-2xl shadow-md border-t border-yellow-500/30">
+                <p class="text-sm text-gray-400 font-medium tracking-wide">Pauses Detected</p>
+                <p class="text-3xl font-bold mt-2 text-white">{{ analysis.pause_count }}</p>
+            </div>
+            <!-- Stability -->
+            <div class="glass-panel p-6 rounded-2xl shadow-md border-t border-teal-500/30">
+                <p class="text-sm text-gray-400 font-medium tracking-wide">Volume Var.</p>
+                <p class="text-3xl font-bold mt-2 text-white">{{ analysis.voice_volume_stability|floatformat:2 }} <span
+                        class="text-sm font-normal text-gray-500">%</span></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Feedback and Transcript -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="glass-panel p-8 rounded-3xl shadow-lg border-l-4 border-l-blue-500">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="text-2xl">💡</span> Improvement
+                Suggestions</h3>
+            <p class="text-gray-300 leading-relaxed font-light mt-4 whitespace-pre-wrap">{{ analysis.suggestions }}</p>
+        </div>
+
+        <div class="glass-panel p-8 rounded-3xl shadow-lg h-64 overflow-y-auto custom-scrollbar">
+            <h3 class="text-xl font-bold mb-4 text-gray-200">Generated Transcript</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">{{ analysis.transcript }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}

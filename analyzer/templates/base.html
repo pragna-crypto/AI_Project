@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Public Speaking Analyzer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center">
+    <nav class="w-full glass-panel fixed top-0 z-50 p-4 shadow-md">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="{% url 'index' %}" class="text-xl font-bold text-blue-400 tracking-wide">
+                🎙️ AI Confidence Analyzer
+            </a>
+            <div class="flex gap-4 items-center">
+                <a href="{% url 'upload' %}" class="hover:text-blue-300 transition-colors">Analyze Speech</a>
+                <a href="{% url 'history' %}" class="hover:text-blue-300 transition-colors">History</a>
+                {% if user.is_authenticated %}
+                <div class="h-6 w-px bg-slate-600 mx-2"></div>
+                <!-- Since django 5 you should use a form but we can use method=post. Or simply a post form for logout -->
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="text-sm border border-red-500/50 text-red-400 hover:bg-red-500/10 px-3 py-1 rounded-full transition-colors">Sign
+                        Out</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow w-full max-w-6xl mt-24 px-4 pb-12">
+        {% block content %}{% endblock %}
+    </main>
+    <footer
+        class="w-full text-center py-6 text-gray-400 text-sm glass-panel border-t-0 border-b-0 border-r-0 border-l-0">
+        &copy; 2026 AI Public Speaking Confidence Analyzer.
+    </footer>
+</body>
+
+</html>

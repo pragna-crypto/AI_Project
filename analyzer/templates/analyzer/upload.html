@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-16 glass-panel p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+    <div
+        class="absolute inset-x-0 -top-8 h-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 blur-xl opacity-30">
+    </div>
+    <div class="text-center relative z-10">
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-2">Upload Speech</h2>
+        <p class="text-gray-400 mb-8 font-light">
+            Upload an audio or video file (.wav, .mp3, .mp4). Note: Ensure the file contains clear audio for accurate
+            transcriptions.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6 text-left" id="uploadForm">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="id_title">Speech Title</label>
+                {{ form.title }}
+                <p class="text-xs text-slate-500 mt-1">E.g., "Company Pitch 2026"</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="id_audio_file">Audio/Video File</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="id_audio_file"
+                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-600 border-dashed rounded-lg cursor-pointer bg-slate-800/50 hover:bg-slate-700/50 transition duration-300">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-4 text-blue-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-400"><span class="font-semibold text-white">Click to
+                                    upload</span> or drag and drop</p>
+                            <p class="text-xs text-gray-500">WAV, MP3, MP4 (MAX. 50MB)</p>
+                        </div>
+                        {{ form.audio_file }}
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn"
+                class="w-full flex justify-center py-3 px-4 rounded-xl shadow-md bg-blue-600 hover:bg-blue-500 text-sm font-semibold tracking-wide text-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition transform hover:-translate-y-0.5">
+                Analyze Confidence
+            </button>
+
+            <div id="loading" class="hidden mt-4 text-center">
+                <div class="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-400"></div>
+                <p class="text-xs text-blue-300 mt-2 font-medium tracking-wide animate-pulse">Analyzing audio features,
+                    pauses, and fillers. Please wait...</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function () {
+        document.getElementById('submitBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loading').classList.remove('hidden');
+    });
+    // Hide default input since styled it
+    document.getElementById('id_audio_file').classList.add('hidden');
+</script>
+{% endblock %}
